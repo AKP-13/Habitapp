@@ -30,6 +30,32 @@ router.get("/habits", authorize, async (req, res) => {
 });
 
 
+// router.get("/event", authorize, async (req, res) => {
+//     try {
+//       const user = await pool.query(
+//           'SELECT * FROM events',
+//       );
+//       console.log(user.rows);
+//       res.json(user.rows);
+//     } catch (err) {
+//       console.error(err.message);
+//       res.status(500).send("Server error");
+//     }
+// });
+
+router.get("/event", authorize, async (req, res) => {
+  try {
+    const user = await pool.query(
+        'SELECT habit, habitdate FROM events WHERE user_id = $1', [req.user]
+    );
+    res.json(user.rows);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server error");
+  }
+});
+
+
 
 // doesn't work with authorize maybe need to set correct id 
 router.post("/habits", async (req, res) => {
@@ -63,7 +89,7 @@ router.delete('/events', async (req, res) => {
   try {
     const { id, habit, date } = req.body
     const user = await pool.query(
-      'DELETE FROM events WHERE user_id = $1 AND habit = $2 AND habitDate = $3', [id, habit, date]
+      "DELETE FROM events WHERE user_id = $1 AND habit = $2 AND habitDate = $3", [id, habit, date]
     )
   } catch (err) {
     console.error(err.message)

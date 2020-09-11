@@ -7,7 +7,8 @@ class HabitInfo extends React.Component {
     state = {
         date: new Date(),
         isModalOpen: this.props.isModalOpen,
-        checked: false
+        dateFree: null,
+        habitDates: []
     }
 
     // openModal = () => {
@@ -18,10 +19,19 @@ class HabitInfo extends React.Component {
     //     this.setState({ isModalOpen: false })
     // }
 
- 
+  componentDidMount = async () => {
+    const res = await fetch("http://localhost:5000/dashboard/event", {
+      method: "GET",
+      headers: { token: localStorage.token }
+  })
+  let dateCheck = []
+  dateCheck = await res.json()
+  this.setState({ habitDates: dateCheck })
+  }
+  
   onChange = date => this.setState({ date })
 
-  onClickDay = (value) => {
+  onClickDay = async (value) => {
     let d = value.getDate();
     let m = value.getMonth()+1;
     let y = value.getFullYear();
@@ -34,12 +44,35 @@ class HabitInfo extends React.Component {
     } 
     let eventDate = (y + "-" + m + "-" + d)
     console.log(y + "-" + m + "-" + d);
-    if(this.state.checked === false){
+
+
+    // Fetch to see if event for that day
+   
+    for (let i = 0; i < this.state.habitDates.length; i++) {
+      if (this.state.habitDates[i].habitdate.includes(eventDate)) {
+        this.setState({ dateFree: false })
+        console.log('date already exists') 
+        break
+      } else {
+        this.setState({ dateFree: true })
+        console.log('date doesnt exist')
+        
+      }
+    }
+    
+    // fetch("http://localhost:5000/dashboard/event", options )
+    // .then(r => r.json())
+    // .then(data => console.log(data))
+    // .catch(console.warn)
+    // if event, state = checked: true
+
+
+    if(this.state.dateFree === true){
         this.props.submitEvent(this.props.habit, eventDate)
-        this.setState({ checked: true }) 
-    } else {
+         
+    } else if (this.state.dateFree === false) {
         this.props.removeEvent(this.props.habit, eventDate)
-        this.setState({ checked: false }) 
+        
     }
     
   }
@@ -48,7 +81,7 @@ class HabitInfo extends React.Component {
     return (
       <div>
         
-        {/* <ReactModal isOpen= { this.state.isModalOpen }> */}
+        <h1>{this.props.user_name}'s {this.props.habit} Page</h1>
             <Calendar
             showWeekNumbers
             onChange={this.onChange}
@@ -56,7 +89,7 @@ class HabitInfo extends React.Component {
             onClickDay = {this.onClickDay}
             />
             <button onClick={ this.props.closeModal }>Close</button>
-        {/* </ReactModal> */}
+        
       </div>
     );
   }

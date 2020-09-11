@@ -104,7 +104,7 @@ class HabitList extends React.Component {
                     })}
 
                     <ReactModal isOpen= { this.state.isModalOpen }> 
-                        <HabitInfo isModalOpen={this.state.isModalOpen} habit={ this.state.habit } submitEvent={ this.submitEvent } removeEvent={ this.removeEvent } closeModal={ this.closeModal } />
+                        <HabitInfo isModalOpen={this.state.isModalOpen} user_name={this.props.habits[0].user_name} habit={ this.state.habit } submitEvent={ this.submitEvent } removeEvent={ this.removeEvent } closeModal={ this.closeModal } />
                     </ReactModal>
                                 
                 </div>
